@@ -10,10 +10,7 @@ This is my first Progressive Web App (PWA) project. I made it to learn about web
 
 ## How to use
 
-1. Open index.html in your browser
-2. Click on the links in the navigation bar to go to different pages
-3. Try adding some items on the form page
-4. Check out the coffee menu
+1. Open github page
 
 ## Features
 

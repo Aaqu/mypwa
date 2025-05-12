@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Menu</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196f3">
+    <link rel="shortcut icon" href="favicon.ico">
+</head>
+<body>
+    <div class="offline-badge" id="offlineBadge">You are offline</div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">My PWA</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="form.html" class="nav-link">Add Item</a>
+                <a href="coffee.html" class="nav-link active">Coffee Menu</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Coffee Menu</h1>
+        <div class="last-sync" id="lastSync"></div>
+        <button class="sync-button" id="syncButton" onclick="syncData()">Sync Data</button>
+        <div id="coffeeGrid" class="coffee-grid">
+            <div class="loading">Loading coffee menu...</div>
+        </div>
+    </div>
+
+    <script>
+        const COFFEE_DATA_KEY = 'coffee-menu-data';
+        const LAST_SYNC_KEY = 'coffee-menu-last-sync';
+
+        const coffeeGrid = document.getElementById('coffeeGrid');
+
+        function updateOnlineStatus() {
+            const offlineBadge = document.getElementById('offlineBadge');
+            if (!navigator.onLine) {
+                offlineBadge.classList.add('show');
+            } else {
+                offlineBadge.classList.remove('show');
+            }
+        }
+
+        function updateLastSyncTime() {
+            const lastSync = localStorage.getItem(LAST_SYNC_KEY);
+            const lastSyncElement = document.getElementById('lastSync');
+            if (lastSync) {
+                const date = new Date(parseInt(lastSync));
+                lastSyncElement.textContent = `Last synced: ${date.toLocaleString()}`;
+            } else {
+                lastSyncElement.textContent = 'Never synced';
+            }
+        }
+
+        function saveCoffeeData(coffees) {
+            localStorage.setItem(COFFEE_DATA_KEY, JSON.stringify(coffees));
+            localStorage.setItem(LAST_SYNC_KEY, Date.now().toString());
+            updateLastSyncTime();
+        }
+
+        function loadCoffeeData() {
+            const data = localStorage.getItem(COFFEE_DATA_KEY);
+            return data ? JSON.parse(data) : null;
+        }
+
+        async function fetchCoffeeMenu() {
+            try {
+                const response = await fetch('https://api.sampleapis.com/coffee/hot');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch coffee menu');
+                }
+                const data = await response.json();
+                saveCoffeeData(data);
+                displayCoffeeMenu(data);
+            } catch (error) {
+                console.error('Error fetching coffee menu:', error);
+                const cachedData = loadCoffeeData();
+                if (cachedData) {
+                    displayCoffeeMenu(cachedData);
+                } else {
+                    showError('Failed to load coffee menu. Please check your internet connection and try again.');
+                }
+            }
+        }
+
+        function displayCoffeeMenu(coffees) {
+            coffeeGrid.innerHTML = '';
+            coffees.forEach(coffee => {
+                const card = document.createElement('div');
+                card.className = 'coffee-card';
+                card.innerHTML = `
+                    <img src="${coffee.image}" alt="${coffee.title}" class="coffee-image">
+                    <div class="coffee-content">
+                        <h2 class="coffee-title">${coffee.title}</h2>
+                        <div class="coffee-price">$${coffee.price || '4.99'}</div>
+                        <p class="coffee-description">${coffee.description}</p>
+                        <div class="coffee-ingredients">
+                            <strong>Ingredients:</strong> ${coffee.ingredients.join(', ')}
+                        </div>
+                    </div>
+                `;
+                coffeeGrid.appendChild(card);
+            });
+        }
+
+        function showError(message) {
+            coffeeGrid.innerHTML = `
+                <div class="error">
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        async function syncData() {
+            const syncButton = document.getElementById('syncButton');
+            syncButton.disabled = true;
+            syncButton.textContent = 'Syncing...';
+            
+            try {
+                await fetchCoffeeMenu();
+                syncButton.textContent = 'Sync Complete';
+            } catch (error) {
+                syncButton.textContent = 'Sync Failed';
+            }
+            
+            setTimeout(() => {
+                syncButton.textContent = 'Sync Data';
+                syncButton.disabled = false;
+            }, 2000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateOnlineStatus();
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            const cachedData = loadCoffeeData();
+            if (cachedData) {
+                displayCoffeeMenu(cachedData);
+            }
+            updateLastSyncTime();
+
+            if (navigator.onLine) {
+                fetchCoffeeMenu();
+            }
+        });
+    </script>
+</body>
+</html> 

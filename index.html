@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My PWA</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196f3">
+    <link rel="shortcut icon" href="favicon.ico">
+</head>
+<body>
+    <div class="offline-badge" id="offlineBadge">You are offline</div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">My PWA</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="form.html" class="nav-link">Add Item</a>
+                <a href="coffee.html" class="nav-link">Coffee Menu</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Welcome to My PWA</h1>
+        
+        <div class="info-grid">
+            <a href="form.html" class="info-card">
+                <div class="info-icon">📝</div>
+                <h2 class="info-title">Add New Items</h2>
+                <p class="info-description">
+                    Create and manage your items with our easy-to-use form. All data is stored locally and works offline.
+                </p>
+                <ul class="feature-list">
+                    <li>Offline data storage</li>
+                    <li>Instant updates</li>
+                    <li>Easy management</li>
+                    <li>Data persistence</li>
+                </ul>
+            </a>
+
+            <a href="coffee.html" class="info-card">
+                <div class="info-icon">☕</div>
+                <h2 class="info-title">Coffee Menu</h2>
+                <p class="info-description">
+                    Browse our curated coffee menu with detailed information about each drink, ingredients, and pricing.
+                </p>
+                <ul class="feature-list">
+                    <li>Detailed descriptions</li>
+                    <li>Ingredient lists</li>
+                    <li>Price information</li>
+                    <li>High-quality images</li>
+                </ul>
+            </a>
+
+            <div class="info-card">
+                <div class="info-icon">📱</div>
+                <h2 class="info-title">Progressive Web App</h2>
+                <p class="info-description">
+                    This application is built as a Progressive Web App (PWA), providing a native app-like experience in your browser.
+                </p>
+                <ul class="feature-list">
+                    <li>Works offline</li>
+                    <li>Installable on devices</li>
+                    <li>Fast loading times</li>
+                    <li>Responsive design</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateOnlineStatus() {
+            const offlineBadge = document.getElementById('offlineBadge');
+            if (!navigator.onLine) {
+                offlineBadge.classList.add('show');
+            } else {
+                offlineBadge.classList.remove('show');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateOnlineStatus();
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+        });
+    </script>
+</body>
+</html> 
